@@ -1,140 +1,116 @@
-# Docker Compose Automation Tool with GUI
+# Prompt to Honeypot CLI & Web Tool
 
-A Python-based tool that automates the generation and execution of `docker-compose.yml` files using GPT responses. This tool provides both a **terminal-based interface** and a **Streamlit web GUI** to process user prompts, interact with a Flask-based API, extract relevant `docker-compose.yml` content, generate an HAProxy configuration if needed, and execute Docker Compose commands to manage containers seamlessly.
+## Description
 
----
+**Prompt to Honeypot** is a tool that allows you to generate a single-container honeypot Docker setup based on a natural language description of a vulnerable IT scenario. Using GPT (OpenAI's GPT-4), this tool automatically creates a `Dockerfile`, `supervisord.conf`, and `setup_services.sh` to simulate vulnerable services in a Docker container. The tool also provides the ability to manage Docker containers and networks for realistic honeypot simulations.
 
-## Features
-
-- **Automated Docker Compose File Generation**
-  Generates `docker-compose.yml` files automatically based on user-provided prompts and GPT responses, ensuring outdated/vulnerable service usage if desired.
-
-- **Dynamic HAProxy Configuration**
-  Optionally creates `haproxy.cfg` by parsing the newly generated `docker-compose.yml`. Only services actually present (e.g., MySQL, phpMyAdmin, FTP, SMB, RDP, DNS, SMTP) are routed, **making the environment appear as a single IP**.
-
-- **YAML Validation**
-  Ensures that the generated YAML syntax is compatible with Docker Compose.
-
-- **Execution of Docker Compose Commands**
-  Start, stop, and manage services using Docker Compose directly from the tool.
-
-- **User-Friendly Web Interface**
-  A **Streamlit-based GUI** simplifies the user experience for managing Docker containers.
-
-- **Command-Line Interface (CLI)**
-  Terminal-based interactive prompts allow CLI users to interact with the tool efficiently.
-
-- **Single IP Exposure**
-  By using HAProxy as the only publicly exposed container, attackers or testers see all services as though they originate from a single host.
+### Key Features:
+Generate a Docker honeypot setup using a custom prompt.<br />
+Create isolated Docker networks to simulate realistic environments.<br />
+Build and run the Docker container with customizable network configurations.<br />
+Stop and remove Docker containers and images.<br />
+List existing Docker networks.<br />
+Reset the project to its initial state.<br />
 
 ---
 
-## Prerequisites
+## Requirements
 
-### General Requirements
-Ensure the following dependencies are installed and properly configured before running the project.
+Before using the **Prompt to Honeypot** tool, ensure you have the following prerequisites:
+Docker installed and running on your machine.<br />
+Python 3.6+ and `pip` to install dependencies.<br />
+Flask for the web API server.<br />
+OpenAI API Key (for generating honeypot configurations using GPT).<br />
+You need to set the API key in the app.py class.
 
-#### 1. Install Python (3.8 or higher)
-Python is required to run this tool. You can install it using Homebrew:
-```bash
-brew install python3
-```
+---
 
-#### 2. Install Docker & Docker Compose
-Install Docker and Docker Compose using Homebrew:
-```bash
-brew install --cask docker
-brew install docker-compose
-```
-Ensure Docker Desktop is running before executing any Docker-related commands.
+## Installation
 
-#### 3. Install Required Python Packages
-Run the following command to install necessary dependencies:
-```bash
-pip3 install -r requirements.txt
-```
+1. Clone the repository:
+
+    ```bash
+    git clone <repository-url>
+    cd <project-directory>
+    ```
+
+2. Create and activate a Python virtual environment (optional but recommended):
+
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate  
+    ```
+
+3. Install the required dependencies:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. For web API functionality (Flask), start the Flask server:
+
+    ```bash
+    python app.py
+    ```
+
+5. For CLI functionality, you can run the tool using:
+
+    ```bash
+    python script.py
+    ```
 
 ---
 
 ## Usage
 
-### Running the Application
-The tool provides multiple interfaces to interact with Docker Compose. You can use either the **CLI** or the **Streamlit web GUI**.
+### Command-Line Interface (CLI)
 
-#### 1. Run the Flask API
-Start the Flask API for GPT-based prompts (if applicable):
-```bash
-python3 app.py
-```
-This hosts the endpoint that ChatGPT or another LLM can use for generating configurations.
+1. **Start the CLI Tool** by running:
+  First flask that handles the API and second the script that handles the logic, in different terminals
+    ```bash
+    python app.py
+    ```
+    ```bash
+    python script.py
+    ```
 
-#### 2. Run the CLI Version
-For terminal-based interaction, execute:
-```bash
-python3 script.py
-```
-Follow the on-screen instructions to provide multi-line prompts. The script then:
-1. Sends the prompt to the Flask API.
-2. Extracts the `docker-compose.yml` from the GPT response.
-3. Optionally generates a dynamic `haproxy.cfg` by parsing the services in the YAML.
-4. Builds and runs the containers using Docker Compose.
+2. **Select an option** from the following menu:
 
-#### 3. Run the Streamlit Web GUI
-To use the graphical interface, execute:
-```bash
-streamlit run GUI.py
-```
-Then, open the following URL in your browser:
-```
-http://127.0.0.1:8501
-```
-The GUI allows you to:
-- Enter prompts and upload files containing prompt text.
-- Review generated `docker-compose.yml` files in real-time.
-- Start, stop, and remove containers directly from the web interface.
+    ```bash
+    --- Docker Honeypot CLI ---
+    1. Generate new setup
+    2. Create host-only network
+    3. Run container
+    4. Build Docker image
+    5. Stop container
+    6. Remove container
+    7. Remove image
+    8. List Docker networks
+    9. Reset project
+    10. Exit
+    11. Help
+    ```
 
----
+    1: Prompts you for an IT scenario and generates a honeypot Docker setup based on GPT's response.
 
-## Managing Docker Containers
+    2: Creates a custom Docker bridge network (isolated network).
 
-### Start Services
-```bash
-docker-compose -f output/docker-compose.yml up -d
-```
+    3: Runs a Docker container with a custom IP address and network.
 
-### Stop Services
-```bash
-docker-compose -f output/docker-compose.yml stop
-```
+    4: Builds the Docker image using the generated configuration files.
 
-### Remove Services & Clean Up
-```bash
-docker-compose -f output/docker-compose.yml down
-```
+    5: Stops the running honeypot container.
 
-### Check Running Containers
-```bash
-docker ps
-```
+    6: Removes the honeypot container.
+
+    7: Removes the Docker image used for the honeypot.
+
+    8: Lists all available Docker networks.
+
+    9: Resets the project (removes all generated files and settings).
+
+    10: Exits the tool.
+
+    11: Shows detailed instructions on how to use the tool.
 
 ---
-
-## HAProxy & Single IP Exposure
-
-When the tool detects services (e.g., MySQL, phpMyAdmin, FTP, SMB, etc.) in `docker-compose.yml`, it can generate an `haproxy.cfg` that forwards each protocol to the appropriate container **internally**. Only **HAProxy** is exposed externally via multiple ports, creating a single attack surface. This approach simulates a **single-machine** environment even though multiple containers run behind it.
-
-**Key Points:**
-- **`haproxy.cfg`** resides in the `output/` directory, mapping each internal service to the correct port.
-- If additional ports (e.g., `445` for SMB, `3389` for RDP) are exposed, ensure matching frontends/backends exist in `haproxy.cfg`.
-- **DNS** often requires UDP, which HAProxy supports only in special configurations or enterprise versions.
-
----
-
-## Additional Notes
-
-- Ensure Docker Desktop is running before executing Docker Compose commands.
-- The tool extracts relevant information from user prompts (with GPT) to generate **vulnerable** or **outdated** Docker images, useful for **honeypot** or **security research** scenarios.
-- The Streamlit GUI provides an intuitive way to manage services without requiring deep command-line knowledge.
-- Logs and output files (including any generated configs) are stored in the `output/` directory for reference.
-- **If certain containers do not exist** (e.g., you remove `ftp` from `docker-compose.yml`), the tool can automatically omit HAProxy frontends/backends for that service, reducing confusion.
-
