@@ -1,0 +1,140 @@
+# Docker Compose Automation Tool with GUI
+
+A Python-based tool that automates the generation and execution of `docker-compose.yml` files using GPT responses. This tool provides both a **terminal-based interface** and a **Streamlit web GUI** to process user prompts, interact with a Flask-based API, extract relevant `docker-compose.yml` content, generate an HAProxy configuration if needed, and execute Docker Compose commands to manage containers seamlessly.
+
+---
+
+## Features
+
+- **Automated Docker Compose File Generation**
+  Generates `docker-compose.yml` files automatically based on user-provided prompts and GPT responses, ensuring outdated/vulnerable service usage if desired.
+
+- **Dynamic HAProxy Configuration**
+  Optionally creates `haproxy.cfg` by parsing the newly generated `docker-compose.yml`. Only services actually present (e.g., MySQL, phpMyAdmin, FTP, SMB, RDP, DNS, SMTP) are routed, **making the environment appear as a single IP**.
+
+- **YAML Validation**
+  Ensures that the generated YAML syntax is compatible with Docker Compose.
+
+- **Execution of Docker Compose Commands**
+  Start, stop, and manage services using Docker Compose directly from the tool.
+
+- **User-Friendly Web Interface**
+  A **Streamlit-based GUI** simplifies the user experience for managing Docker containers.
+
+- **Command-Line Interface (CLI)**
+  Terminal-based interactive prompts allow CLI users to interact with the tool efficiently.
+
+- **Single IP Exposure**
+  By using HAProxy as the only publicly exposed container, attackers or testers see all services as though they originate from a single host.
+
+---
+
+## Prerequisites
+
+### General Requirements
+Ensure the following dependencies are installed and properly configured before running the project.
+
+#### 1. Install Python (3.8 or higher)
+Python is required to run this tool. You can install it using Homebrew:
+```bash
+brew install python3
+```
+
+#### 2. Install Docker & Docker Compose
+Install Docker and Docker Compose using Homebrew:
+```bash
+brew install --cask docker
+brew install docker-compose
+```
+Ensure Docker Desktop is running before executing any Docker-related commands.
+
+#### 3. Install Required Python Packages
+Run the following command to install necessary dependencies:
+```bash
+pip3 install -r requirements.txt
+```
+
+---
+
+## Usage
+
+### Running the Application
+The tool provides multiple interfaces to interact with Docker Compose. You can use either the **CLI** or the **Streamlit web GUI**.
+
+#### 1. Run the Flask API
+Start the Flask API for GPT-based prompts (if applicable):
+```bash
+python3 app.py
+```
+This hosts the endpoint that ChatGPT or another LLM can use for generating configurations.
+
+#### 2. Run the CLI Version
+For terminal-based interaction, execute:
+```bash
+python3 script.py
+```
+Follow the on-screen instructions to provide multi-line prompts. The script then:
+1. Sends the prompt to the Flask API.
+2. Extracts the `docker-compose.yml` from the GPT response.
+3. Optionally generates a dynamic `haproxy.cfg` by parsing the services in the YAML.
+4. Builds and runs the containers using Docker Compose.
+
+#### 3. Run the Streamlit Web GUI
+To use the graphical interface, execute:
+```bash
+streamlit run GUI.py
+```
+Then, open the following URL in your browser:
+```
+http://127.0.0.1:8501
+```
+The GUI allows you to:
+- Enter prompts and upload files containing prompt text.
+- Review generated `docker-compose.yml` files in real-time.
+- Start, stop, and remove containers directly from the web interface.
+
+---
+
+## Managing Docker Containers
+
+### Start Services
+```bash
+docker-compose -f output/docker-compose.yml up -d
+```
+
+### Stop Services
+```bash
+docker-compose -f output/docker-compose.yml stop
+```
+
+### Remove Services & Clean Up
+```bash
+docker-compose -f output/docker-compose.yml down
+```
+
+### Check Running Containers
+```bash
+docker ps
+```
+
+---
+
+## HAProxy & Single IP Exposure
+
+When the tool detects services (e.g., MySQL, phpMyAdmin, FTP, SMB, etc.) in `docker-compose.yml`, it can generate an `haproxy.cfg` that forwards each protocol to the appropriate container **internally**. Only **HAProxy** is exposed externally via multiple ports, creating a single attack surface. This approach simulates a **single-machine** environment even though multiple containers run behind it.
+
+**Key Points:**
+- **`haproxy.cfg`** resides in the `output/` directory, mapping each internal service to the correct port.
+- If additional ports (e.g., `445` for SMB, `3389` for RDP) are exposed, ensure matching frontends/backends exist in `haproxy.cfg`.
+- **DNS** often requires UDP, which HAProxy supports only in special configurations or enterprise versions.
+
+---
+
+## Additional Notes
+
+- Ensure Docker Desktop is running before executing Docker Compose commands.
+- The tool extracts relevant information from user prompts (with GPT) to generate **vulnerable** or **outdated** Docker images, useful for **honeypot** or **security research** scenarios.
+- The Streamlit GUI provides an intuitive way to manage services without requiring deep command-line knowledge.
+- Logs and output files (including any generated configs) are stored in the `output/` directory for reference.
+- **If certain containers do not exist** (e.g., you remove `ftp` from `docker-compose.yml`), the tool can automatically omit HAProxy frontends/backends for that service, reducing confusion.
+
