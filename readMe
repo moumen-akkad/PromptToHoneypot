@@ -1,0 +1,116 @@
+# Prompt to Honeypot CLI & Web Tool
+
+## Description
+
+**Prompt to Honeypot** is a tool that allows you to generate a single-container honeypot Docker setup based on a natural language description of a vulnerable IT scenario. Using GPT (OpenAI's GPT-4), this tool automatically creates a `Dockerfile`, `supervisord.conf`, and `setup_services.sh` to simulate vulnerable services in a Docker container. The tool also provides the ability to manage Docker containers and networks for realistic honeypot simulations.
+
+### Key Features:
+Generate a Docker honeypot setup using a custom prompt.<br />
+Create isolated Docker networks to simulate realistic environments.<br />
+Build and run the Docker container with customizable network configurations.<br />
+Stop and remove Docker containers and images.<br />
+List existing Docker networks.<br />
+Reset the project to its initial state.<br />
+
+---
+
+## Requirements
+
+Before using the **Prompt to Honeypot** tool, ensure you have the following prerequisites:
+Docker installed and running on your machine.<br />
+Python 3.6+ and `pip` to install dependencies.<br />
+Flask for the web API server.<br />
+OpenAI API Key (for generating honeypot configurations using GPT).<br />
+You need to set the API key in the app.py class.
+
+---
+
+## Installation
+
+1. Clone the repository:
+
+    ```bash
+    git clone <repository-url>
+    cd <project-directory>
+    ```
+
+2. Create and activate a Python virtual environment (optional but recommended):
+
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate  
+    ```
+
+3. Install the required dependencies:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. For web API functionality (Flask), start the Flask server:
+
+    ```bash
+    python app.py
+    ```
+
+5. For CLI functionality, you can run the tool using:
+
+    ```bash
+    python script.py
+    ```
+
+---
+
+## Usage
+
+### Command-Line Interface (CLI)
+
+1. **Start the CLI Tool** by running:
+  First flask that handles the API and second the script that handles the logic, in different terminals
+    ```bash
+    python app.py
+    ```
+    ```bash
+    python script.py
+    ```
+
+2. **Select an option** from the following menu:
+
+    ```bash
+    --- Docker Honeypot CLI ---
+    1. Generate new setup
+    2. Create host-only network
+    3. Run container
+    4. Build Docker image
+    5. Stop container
+    6. Remove container
+    7. Remove image
+    8. List Docker networks
+    9. Reset project
+    10. Exit
+    11. Help
+    ```
+
+    1: Prompts you for an IT scenario and generates a honeypot Docker setup based on GPT's response.
+
+    2: Creates a custom Docker bridge network (isolated network).
+
+    3: Runs a Docker container with a custom IP address and network.
+
+    4: Builds the Docker image using the generated configuration files.
+
+    5: Stops the running honeypot container.
+
+    6: Removes the honeypot container.
+
+    7: Removes the Docker image used for the honeypot.
+
+    8: Lists all available Docker networks.
+
+    9: Resets the project (removes all generated files and settings).
+
+    10: Exits the tool.
+
+    11: Shows detailed instructions on how to use the tool.
+
+---
